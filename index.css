@@ -1,11 +1,11 @@
 * {
     box-sizing: border-box;
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 20px;
+    font-size: 15px;
   }
 
 h1 {
-    font-size: 40px;
+    font-size: 20px;
     text-align: center;
 }
 
@@ -22,7 +22,7 @@ span {
 }
 button {
     
-    padding:10px;
+    padding:5px;
     border-radius: 4px;
 }
 .rating_button {
@@ -71,12 +71,13 @@ div.add_and_minRating {
     display: none;
     position: absolute;
     background-color: gold;
+    border-radius: 5px;
     min-width: 100px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     padding: 12px 16px;
     z-index: 1;
 }
 
-.dropdown:hover .dropdown-content {
+ .dropdown:hover .dropdown-content {
     display: block;
-}
+} 

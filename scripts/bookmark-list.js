@@ -84,11 +84,11 @@ const bookmarkList = (function(){
             <label for="bM_title">Title:</label>    
             <input type="text" name="title" id="bM_title" />
             <label for="bM_url">URL:</label>    
-            <input type="text" name="url" id="bM_url" />
-            <label for="bM_descrition">Descrition:</label>    
-            <input type="text" name="desc" id="bM_descrition" />
+            <input type="text" placeholder="eg: http//google.com"name="url" id="bM_url" />
+            <label for="bM_descrition">Description:</label>    
+            <input type="text" placeholder="" name="desc" id="bM_descrition" />
             <label for="bM_rating">Rating:</label>    
-            <input type="text" name="rating" id="bM_rating" />       
+            <input type="text" name="rating" placeholder="eg: 1-5" id="bM_rating" />       
         </div>
     </form>
     </div>`;
@@ -99,7 +99,7 @@ const bookmarkList = (function(){
         <span class="button">Add Bookmark</span>
     </button>
     <div class="dropdown">
-         <span>Select Minimum Rating</span>
+    <span>Select Minimum Rating</span>
          <div class="dropdown-content">
            <button class="js_one_star star_button"> 
                 1 Star
@@ -165,7 +165,11 @@ const bookmarkList = (function(){
       store.addingBM = !store.addingBM;
       const res = $(e.target).serializeJson();
       console.log(res);
-      api.createItem(res, bookmarkSucess, 
+      api.createItem(res, 
+        (res) => {
+          store.addBookmark(res);
+          render();
+        }, 
         (err) => {
           console.log(err);
           store.setError(err);
@@ -193,7 +197,7 @@ const bookmarkList = (function(){
       api.deleteItem(id, 
         () => {
           store.serchAndDestroy(id);
-          console.log('find and delete ran');
+          console.log('search and destroy ran');
           render();
         },
         (err) => {
@@ -205,11 +209,6 @@ const bookmarkList = (function(){
     });
   }
 
- 
-  function bookmarkSucess() {
-    render();
-    console.log('sucess');
-  }
 
   function handleExpandButton() {  
     $('.js_bookmark_list').on('click','.js_title_expand',  function(e) {
