@@ -10,7 +10,7 @@ const bookmarkList = (function(){
             <button class="js_title_expand">
             <span class="title_button">${item.title}</span>
             </button>
-            <span class="rating">${item.rating}</span>
+            <span class="rating">Rating: ${item.rating}</span>
     </div>`;
   }
 
@@ -25,7 +25,7 @@ const bookmarkList = (function(){
     
     const addBMisTrue = 
     `<div class="js_add_bookmark_view">
-    <form id="js_add_bookmark">
+    <form id="js_create_bookmark">
         <div class="create_bookmark">
             <button class="js_create_bookmark"> 
                 <span class="button">Create Bookmark</span>
@@ -48,17 +48,47 @@ const bookmarkList = (function(){
         <span class="button">Add Bookmark</span>
     </button>
     <div class="dropdown">
-         <span>Select Rating</span>
+         <span>Select Minimum Rating</span>
          <div class="dropdown-content">
-           <p>1 Star</p>
-           <p>2 Star</p>
-           <p>3 Star</p>
-           <p>4 Star</p>
-           <p>5 Star</p>
+           <button class="js_one_star star_button"> 
+                <span class="rating_button">1 Star</span>
+            </button>
+            <button class="js_two_star star_button"> 
+                <span class="rating_button">2 Star</span>
+            </button>
+            <button class="js_three_star star_button"> 
+                <span class="rating_button">3 Star</span>
+            </button>
+            <button class="js_four_star star_button"> 
+                <span class="rating_button">4 Star</span>
+            </button>
+            <button class="js_five_star star_button"> 
+                <span class="rating_button">5 Star</span>
+            </button>
+            <button class="js_any_star star_button"> 
+                <span class="rating_button">None</span>
+            </button>
          </div>
      </div>
     </div>`;
+    let bookmarks = [ ...store.bookmarks ];
 
+    if (store.rating === 5) {
+      bookmarks = store.bookmarks.Rating.filter(num => num>=5);
+    }
+    if (store.rating === 4) {
+      bookmarks = store.bookmarks.Rating.filter(num => num>=4);
+    }
+    if (store.rating === 3) {
+      bookmarks = store.bookmarks.Rating.filter(num => num>=3);
+    }
+    if (store.rating === 2) {
+      bookmarks = store.bookmarks.Rating.filter(num => num>=2);
+    }
+    if (store.rating === 1) {
+      bookmarks = store.bookmarks.Rating.filter(num => num>=1);
+    }
+    
 
     if (store.addingBM === true ){
       $('.js_adding_BM_toggled').html(addBMisTrue);
@@ -67,7 +97,7 @@ const bookmarkList = (function(){
     }
 
     
-    const bookmarkListString = makeBookmarksString(store.bookmarks);
+    const bookmarkListString = makeBookmarksString(bookmarks);
     $('.js_bookmark_list').html(bookmarkListString);
   }
    
@@ -75,7 +105,7 @@ const bookmarkList = (function(){
     $('.js_adding_BM_toggled').on('click', '.js_add_bookmark',function (event) {
       event.preventDefault();
       console.log('bookmark clicked');
-      store.addingBM === !store.addingBM;
+      store.addingBM = !store.addingBM;
       console.log(store.addingBM);
       render();
     });
@@ -93,17 +123,38 @@ const bookmarkList = (function(){
   });
   
   function handleCreateBookmark() {
-    $('.js_add_bookmark').on('submit', e => {
+    $('.js_adding_BM_toggled').on('submit', '#js_create_bookmark', function (e) {
       e.preventDefault();
-      const res = $(e.target).serialieJSON();
+      console.log('i made it here!!');
+      store.addingBM = !store.addingBM;
+      const res = $(e.target).serializeJson();
       console.log(res);
+      api.createItem(res, bookmarkSucess, bookmarkError);
     });
+  }
+
+  function bookmarkError() {
+    console.log('!sucess');
+
+  }
+  function bookmarkSucess() {
+    console.log('sucess');
+  }
+
+  function handleExpandButton() {
+
+  }
+
+  function handleMinRating() {
+
   }
   
 
   function bindEventListeners() {
     handleAddBookmarkClicked(); 
     handleCreateBookmark();
+    handleExpandButton();
+    handleMinRating();
   }
 
 

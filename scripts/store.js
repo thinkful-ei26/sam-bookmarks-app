@@ -9,8 +9,8 @@ const store = (function() {
 
   return {
     bookmarks:[],
-    addingBM: true,
-    minRating: null,
+    addingBM: false,
+    minRating: 4,
     error: null,
 
 
