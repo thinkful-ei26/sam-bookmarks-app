@@ -16,11 +16,20 @@ const api =(function() {
       error: onError,
     });
   };
+  const deleteItem = function(id, onSuccess, onError) {
+    $.ajax({
+      url: BASE_URL + '/bookmarks/' + id,
+      method: 'DELETE',
+      success: onSuccess,
+      error: onError,
+    });
+  };
 
 
   return {
     getServerItems,
     createItem,
+    deleteItem,
 
   };
 

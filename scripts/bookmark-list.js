@@ -4,24 +4,75 @@
 const bookmarkList = (function(){
 
   function makeSingleBookmark (item) {
-      
-    return `
-      <div class="simple_view">
-            <button class="js_title_expand">
-            <span class="title_button">${item.title}</span>
-            </button>
-            <span class="rating">Rating: ${item.rating}</span>
-    </div>`;
-  }
 
+    if (store.minRating > item.rating) { 
+        
+      return '';
+    }
+
+    if (item.expanded === false){
+      return `
+        <div class="view" data-item-id="${item.id}">
+              <button class="js_title_expand">
+              <a> ${item.title} </a>
+              </button>
+              <span class="rating">Rating: ${item.rating}</span>
+      </div>`;
+    }
+    if (item.expanded === true) {
+    
+      return `
+        <div class="view" data-item-id="${item.id}">
+    <button class="js_title_shrink">
+        <a class="title_button">${item.title}</a>
+    </button>
+    <span class="description">Descripton: ${item.desc}</span>
+    <span class="rating">Rating: ${item.rating}</span>
+    <button class="js_visitSite"> 
+    <a href="${item.url}" class="button" target="_blank">Go to Site</a>
+    </button>
+    <button class="js_delete_bookmark"> 
+       Delete 
+    </button>
+    </div>`;  
+    }
+  }
+   
 
   function makeBookmarksString(bookmarkList) {
+    //could move rating logic here with .filter
     const items = bookmarkList.map((bookmark) => makeSingleBookmark(bookmark));
     return items.join('');
   }
 
+
+  function generateError(err) {
+    let message = '';
+    if (err.responseJSON && err.responseJSON.message) {
+      message = err.responseJSON.message;
+    } else {
+      message = `${err.code} Server Error`;
+    }
+
+    return `
+      <section class="error_content">
+        <button id="cancel_error">X</button>
+        <p>${message}</p>
+      </section>
+    `;
+  }
+
+
   function render() {
-    console.log('render ran');
+
+    if (store.error) {
+      const el = generateError(store.error);
+      $('.error_container').html(el);
+    } else {
+      $('.error_container').empty();
+    }
+
+    console.log(store.addingBM);
     
     const addBMisTrue = 
     `<div class="js_add_bookmark_view">
@@ -35,7 +86,7 @@ const bookmarkList = (function(){
             <label for="bM_url">URL:</label>    
             <input type="text" name="url" id="bM_url" />
             <label for="bM_descrition">Descrition:</label>    
-            <input type="text" name="descrition" id="bM_descrition" />
+            <input type="text" name="desc" id="bM_descrition" />
             <label for="bM_rating">Rating:</label>    
             <input type="text" name="rating" id="bM_rating" />       
         </div>
@@ -51,43 +102,25 @@ const bookmarkList = (function(){
          <span>Select Minimum Rating</span>
          <div class="dropdown-content">
            <button class="js_one_star star_button"> 
-                <span class="rating_button">1 Star</span>
+                1 Star
             </button>
             <button class="js_two_star star_button"> 
-                <span class="rating_button">2 Star</span>
+                2 Star
             </button>
             <button class="js_three_star star_button"> 
-                <span class="rating_button">3 Star</span>
+                3 Star
             </button>
             <button class="js_four_star star_button"> 
-                <span class="rating_button">4 Star</span>
+                4 Star
             </button>
             <button class="js_five_star star_button"> 
-                <span class="rating_button">5 Star</span>
-            </button>
-            <button class="js_any_star star_button"> 
-                <span class="rating_button">None</span>
+                5 Star
             </button>
          </div>
      </div>
     </div>`;
-    let bookmarks = [ ...store.bookmarks ];
 
-    if (store.rating === 5) {
-      bookmarks = store.bookmarks.Rating.filter(num => num>=5);
-    }
-    if (store.rating === 4) {
-      bookmarks = store.bookmarks.Rating.filter(num => num>=4);
-    }
-    if (store.rating === 3) {
-      bookmarks = store.bookmarks.Rating.filter(num => num>=3);
-    }
-    if (store.rating === 2) {
-      bookmarks = store.bookmarks.Rating.filter(num => num>=2);
-    }
-    if (store.rating === 1) {
-      bookmarks = store.bookmarks.Rating.filter(num => num>=1);
-    }
+    
     
 
     if (store.addingBM === true ){
@@ -95,8 +128,11 @@ const bookmarkList = (function(){
     } else {
       $('.js_adding_BM_toggled').html(addBMisFalse); 
     }
-
     
+    
+    let bookmarks = [ ...store.bookmarks ];
+
+         
     const bookmarkListString = makeBookmarksString(bookmarks);
     $('.js_bookmark_list').html(bookmarkListString);
   }
@@ -129,24 +165,107 @@ const bookmarkList = (function(){
       store.addingBM = !store.addingBM;
       const res = $(e.target).serializeJson();
       console.log(res);
-      api.createItem(res, bookmarkSucess, bookmarkError);
+      api.createItem(res, bookmarkSucess, 
+        (err) => {
+          console.log(err);
+          store.setError(err);
+          render();
+        });
+      
+    });
+    render();
+    
+  }
+
+  function getItemIdFromElement(item) {
+    return $(item)
+      .closest('.view')
+      .data('item-id');
+  }
+
+  function handleDeleteBookmark() {
+    console.log('delete handelr getting setup');
+    $('.js_bookmark_list').on('click', '.js_delete_bookmark', function (e) {
+      e.preventDefault();
+      console.log('deleted was pushed!');
+      const id = getItemIdFromElement(e.currentTarget);
+      console.log(id);
+      api.deleteItem(id, 
+        () => {
+          store.serchAndDestroy(id);
+          console.log('find and delete ran');
+          render();
+        },
+        (err) => {
+          console.log(err);
+          store.setError(err);
+          render();
+        }
+      );
     });
   }
 
-  function bookmarkError() {
-    console.log('!sucess');
-
-  }
+ 
   function bookmarkSucess() {
+    render();
     console.log('sucess');
   }
 
-  function handleExpandButton() {
-
+  function handleExpandButton() {  
+    $('.js_bookmark_list').on('click','.js_title_expand',  function(e) {
+      e.preventDefault();
+      const id = getItemIdFromElement(e.currentTarget);
+      const item = store.findById(id);
+      store.findAndUpdate(id, { expanded: !item.expanded });
+      console.log('handle expand ran');
+      render();
+    });
   }
 
-  function handleMinRating() {
+  function handleShrinkButton() {  
+    $('.js_bookmark_list').on('click','.js_title_shrink',  function(e) {
+      e.preventDefault();
+      const id = getItemIdFromElement(e.currentTarget);
+      const item = store.findById(id);
+      store.findAndUpdate(id, { expanded: !item.expanded });
+      console.log('handle shrink ran');
+      render();
+    });
+  }
 
+
+  function handleMinRating() {
+    $('.js_adding_BM_toggled').on('click', '.js_one_star', () => {
+      store.minRating = 1;
+      console.log('minRating changed to 1');
+      render();
+    });
+    $('.js_adding_BM_toggled').on('click', '.js_two_star', () => {
+      store.minRating = 2;
+      console.log('minRating changed to 2');
+      render();
+    });
+    $('.js_adding_BM_toggled').on('click', '.js_three_star', () => {
+      store.minRating = 3;
+      console.log('minRating changed to 3');
+      render();
+    });
+    $('.js_adding_BM_toggled').on('click', '.js_four_star', () => {
+      store.minRating = 4;
+      console.log('minRating changed to 4');
+      render();
+    });
+    $('.js_adding_BM_toggled').on('click', '.js_five_star', () => {
+      store.minRating = 5;
+      console.log('minRating changed to 5');
+      render();
+    });
+  }
+  function handleCloseError() {
+    $('.error_container').on('click', '#cancel_error', () => {
+      store.setError(null);
+      render();
+    });
   }
   
 
@@ -155,6 +274,9 @@ const bookmarkList = (function(){
     handleCreateBookmark();
     handleExpandButton();
     handleMinRating();
+    handleDeleteBookmark();
+    handleShrinkButton();
+    handleCloseError();
   }
 
 
