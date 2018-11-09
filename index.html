@@ -6,53 +6,22 @@
     <title>Page Title</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="index.css">
-    <script src="index.js"></script>
+    
 </head>
 <body>
     <main>
         <h1>My Bookmarks</h1>
     </main>
+    <div class="js_adding_BM_toggled">
 
-    <div class="add_and_minRating">
-       <button class="add-bookmark js_add_bookmark">
-           <span class="button">Add Bookmark</span>
-       </button>
-       <div class="dropdown">
-            <span>Select Rating</span>
-            <div class="dropdown-content">
-              <p>1 Star</p>
-              <p>2 Star</p>
-              <p>3 Star</p>
-              <p>4 Star</p>
-              <p>5 Star</p>
-            </div>
-        </div>
     </div>
 
+    <ul class="js_bookmark_list">
+    </ul>
 
-<div class="add_bookmark_view">
-    <form id="js_add_bookmark">
-        <div class="create_bookmark">
-            <button class="js_create_bookmark"> 
-                <span class="button">Create Bookmark</span>
-            </button>
-            <label for="bM_title">Title:</label>    
-            <input type="text" name="title" id="bM_title" />
-            <label for="bM_url">URL:</label>    
-            <input type="text" name="url" id="bM_url" />
-            <label for="bM_descrition">Descrition:</label>    
-            <input type="text" name="descrition" id="bM_descrition" />
-            <label for="bM_rating">Rating:</label>    
-            <input type="text" name="rating" id="bM_rating" />       
-        </div>
-    </form>
-</div>
-<div class="simple_view">
-    <button class="js_title_expand">
-            <span class="title_button">Bookmark Title</span>
-    </button>
-    <span class="rating">Bookmark Rating</span>
-</div>
+
+
+
 
 <div class="expanded_view">
     <button class="js_title_shrink">
@@ -68,6 +37,11 @@
     </button>
 </div>
 
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script type="text/javascript" src="scripts/api.js"></script>
+<script type="text/javascript" src="scripts/store.js"></script>
+<script type="text/javascript" src="scripts/bookmark-list.js"></script>
+<script type="text/javascript" src="scripts/index.js"></script>
 
-        </body>
+</body>
 </html>
